@@ -101,7 +101,7 @@ const Home = () => {
   async function showSlides() {
     for (const page of pages) {
       setCurrentPage(page);
-      await util.sleep(page.Tempo * 2);
+      await util.sleep(page.Tempo);
     }
 
     console.log("Resetou");
