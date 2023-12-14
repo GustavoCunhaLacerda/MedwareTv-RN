@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useState } from "react";
-import { StyleSheet } from "react-native";
 import WebView from "react-native-webview";
 
+const imageFiles = ["png", "gif", "jpg", "jpeg"]
 const Home = () => {
   const counter = useRef(0);
 
@@ -23,12 +23,30 @@ const Home = () => {
   }
 
   useEffect(() => {
-    let url = (new URL(webUri)).href;
-    url = url.substring(0, url.length - 1); 
-    console.log(url);
-    setHtml(
-      `<html style="height: 100%;"><head><meta name="viewport" content="width=device-width, minimum-scale=0.1"><title>PCS.png (2480×3508)</title></head><body style="margin: 0px; height: 100%; background-color: rgb(14, 14, 14);"><img style="display: block;-webkit-user-select: none;margin: auto;cursor: zoom-in;background-color: hsl(0, 0%, 90%);transition: background-color 300ms; height: 100%; max-width: 100%; object-fit: contain;" src="${url}"></body></html>`
-    );
+    let url = "https://api.medware.com.br/Arquivos/Geral/MOD1.mp4";
+    url = url.substring(0, url.length - 1);
+
+    const fileExtension = webUri.split(".").pop();
+
+    let content = "";
+
+    if (imageFiles.includes(fileExtension)) {
+      content = `<img style="display: block;-webkit-user-select: none;margin: auto;cursor: zoom-in;background-color: hsl(0, 0%, 90%);transition: background-color 300ms; height: 100%; max-width: 100%; object-fit: contain;" src="${url}">`
+
+      setHtml(
+        `<html style="height: 100%;"><head><meta name="viewport" content="width=device-width, minimum-scale=0.1"></head><body style="margin: 0px; height: 100%; background-color: rgb(14, 14, 14);">${content}</body></html>`
+      );
+
+    } else {
+      content = `<embed src="${url}" width="100%" height="100%"/>`;
+      setHtml(
+        url
+      );
+    }
+
+    console.log(content);
+
+   
   }, [webUri]);
 
   useEffect(() => {
@@ -39,17 +57,14 @@ const Home = () => {
     const updateImage = setInterval(() => {
       if (!pages) return;
 
+      setWebUri(pages[counter.current]?.URL);
+
       counter.current = counter.current + 1;
 
       if (counter.current > pages.length) {
-        console.log("entrouAqui");
         counter.current = 0;
       }
-
-      setWebUri(pages[counter.current]?.URL);
-
-      setUpdate(true);
-    }, 5 * 1000);
+    }, 5 * 2000);
 
     return () => clearInterval(updateImage);
 
@@ -61,7 +76,7 @@ const Home = () => {
 
   return (
     <WebView
-      source={{ html }}
+      source={{  }}
       style={{ flex: 1, height: "100%", width: "100%" }}
       scalesPageToFit={true}
       useWebKit={true}
@@ -70,15 +85,3 @@ const Home = () => {
 };
 
 export default Home;
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    margin: 16,
-  },
-  webview: {
-    flex: 1,
-    borderRadius: 8,
-    overflow: "hidden",
-  },
-});
