@@ -1,86 +1,133 @@
 import React, { useRef, useEffect, useState } from "react";
 import WebView from "react-native-webview";
+import api from "../api";
+import { MedwareTvPage } from "../api/medwaretv";
+import util from "../util";
 
-const imageFiles = ["png", "gif", "jpg", "jpeg"]
+const imageFiles = ["png", "gif", "jpg", "jpeg"];
+const videoFiles = ["mp4", "avi", "wmv"];
+
+type TVPage = MedwareTvPage & {
+  MediaType?: "video" | "text" | "image";
+  HTML?: string | null;
+};
+
+function useBaseHTML(content: string) {
+  return `
+    <html style="height: 100%;">
+      <head>
+        <meta name="viewport" content="width=device-width, minimum-scale=0.1">
+      </head>
+      <body style="margin: 0px; height: 100%; background-color: rgb(14, 14, 14);">
+      ${content}
+      </body>
+    </html>`;
+}
+
 const Home = () => {
-  const counter = useRef(0);
+  const [pages, setPages] = useState<TVPage[]>([]);
+  const [currentPage, setCurrentPage] = useState<TVPage | null>(null);
 
-  const [update, setUpdate] = useState(false);
-  const [pages, setPages] = useState(null);
-  const [webUri, setWebUri] = useState("");
-  const [html, setHtml] = useState("");
+  function addMediaType(pages: MedwareTvPage[]) {
+    return pages.map((page) => {
+      const contentFileExtension = page.URL.split(".").pop() ?? "";
 
-  async function fetchData() {
-    const response = await fetch(
-      "https://api.medware.com.br/MedwareTv/?" +
-        new URLSearchParams({
-          codTv: 1,
-        })
-    );
+      const pageWithMediaType: TVPage = {
+        ...page,
+      };
 
-    const pages = await response.json();
-    setPages(pages);
+      if (imageFiles.includes(contentFileExtension)) {
+        pageWithMediaType.MediaType = "image";
+        return pageWithMediaType;
+      }
+
+      if (videoFiles.includes(contentFileExtension)) {
+        pageWithMediaType.MediaType = "video";
+        return pageWithMediaType;
+      }
+
+      if (contentFileExtension === "txt") {
+        pageWithMediaType.MediaType = "text";
+        return pageWithMediaType;
+      }
+
+      return pageWithMediaType;
+    });
+  }
+
+  function addHtml(pages: TVPage[]) {
+    return pages.map((page) => {
+      if (!page.MediaType) {
+        return { ...page, HTML: useBaseHTML("<p>Arquivo inválido!</p>") };
+      }
+
+      if (page.MediaType == "image") {
+        const imageHTML = `
+            <img style="display: block;-webkit-user-select: none;margin: auto;cursor: zoom-in;background-color: #000;transition: background-color 300ms;height: 100%;max-width: 100%;object-fit: contain;" src="${page.URL}">`;
+        return { ...page, HTML: imageHTML };
+      }
+
+      if (page.MediaType == "text") {
+        const imageHTML = `
+            <embed 
+              type="text/txt" 
+              src="${page.URL}" width="100%" height="100%"
+            >`;
+        return { ...page, HTML: imageHTML };
+      }
+
+      return page;
+    });
+  }
+
+  async function buildSlideList() {
+    try {
+      setPages([]);
+      const response = await api.medwaretv.list<MedwareTvPage[]>("1");
+
+      const pagesWithMediaType = addMediaType(response);
+      const pagesWithHtml = addHtml(pagesWithMediaType);
+
+      // console.log({ pagesWithMediaType });
+      // console.log({ pagesWithHtml });
+
+      setPages(pagesWithHtml);
+    } catch (error) {
+      console.log(error);
+      setPages([]);
+    }
+  }
+
+  async function showSlides() {
+    for (const page of pages) {
+      setCurrentPage(page);
+      await util.sleep(page.Tempo * 2);
+    }
+
+    console.log("Resetou");
+
+    buildSlideList();
   }
 
   useEffect(() => {
-    let url = "https://api.medware.com.br/Arquivos/Geral/MOD1.mp4";
-    url = url.substring(0, url.length - 1);
-
-    const fileExtension = webUri.split(".").pop();
-
-    let content = "";
-
-    if (imageFiles.includes(fileExtension)) {
-      content = `<img style="display: block;-webkit-user-select: none;margin: auto;cursor: zoom-in;background-color: hsl(0, 0%, 90%);transition: background-color 300ms; height: 100%; max-width: 100%; object-fit: contain;" src="${url}">`
-
-      setHtml(
-        `<html style="height: 100%;"><head><meta name="viewport" content="width=device-width, minimum-scale=0.1"></head><body style="margin: 0px; height: 100%; background-color: rgb(14, 14, 14);">${content}</body></html>`
-      );
-
-    } else {
-      content = `<embed src="${url}" width="100%" height="100%"/>`;
-      setHtml(
-        url
-      );
-    }
-
-    console.log(content);
-
-   
-  }, [webUri]);
-
-  useEffect(() => {
-    if (!pages) {
-      return;
-    }
-
-    const updateImage = setInterval(() => {
-      if (!pages) return;
-
-      setWebUri(pages[counter.current]?.URL);
-
-      counter.current = counter.current + 1;
-
-      if (counter.current > pages.length) {
-        counter.current = 0;
-      }
-    }, 5 * 2000);
-
-    return () => clearInterval(updateImage);
-
+    if (pages.length > 0) showSlides();
   }, [pages]);
 
   useEffect(() => {
-    fetchData();
+    buildSlideList();
   }, []);
 
   return (
-    <WebView
-      source={{  }}
-      style={{ flex: 1, height: "100%", width: "100%" }}
-      scalesPageToFit={true}
-      useWebKit={true}
-    />
+    currentPage && (
+      <WebView
+        source={
+          currentPage.HTML
+            ? { html: currentPage.HTML }
+            : { uri: currentPage.URL }
+        }
+        scalesPageToFit={true}
+      />
+    )
   );
 };
 
