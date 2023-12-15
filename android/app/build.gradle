@@ -81,9 +81,9 @@ android {
 
     compileSdkVersion rootProject.ext.compileSdkVersion
 
-    namespace 'com.anonymous.MedwareTvRN'
+    namespace 'com.medware.mdwaretv'
     defaultConfig {
-        applicationId 'com.anonymous.MedwareTvRN'
+        applicationId 'com.medware.mdwaretv'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

@@ -18,7 +18,7 @@ function useBaseHTML(content: string) {
       <head>
         <meta name="viewport" content="width=device-width, minimum-scale=0.1">
       </head>
-      <body style="margin: 0px; height: 100%; background-color: rgb(14, 14, 14);">
+      <body style="margin: 0px; padding: 0; height: 100%; background-color: rgb(14, 14, 14);">
       ${content}
       </body>
     </html>`;
@@ -58,7 +58,12 @@ const Home = () => {
   function addHtml(pages: TVPage[]) {
     return pages.map((page) => {
       if (!page.MediaType) {
-        return { ...page, HTML: useBaseHTML("<p>Arquivo inválido!</p>") };
+        return {
+          ...page,
+          HTML: useBaseHTML(
+            "<p style='width: 100%; height: 100%; color: #fff; text-color: #fff; display:flex; justify-content: center; align-items: center'>Arquivo inválido!</p>",
+          ),
+        };
       }
 
       if (page.MediaType == "image") {
@@ -72,6 +77,7 @@ const Home = () => {
             <embed 
               type="text/txt" 
               src="${page.URL}" width="100%" height="100%"
+              style="width: 100%; height: 100%; color: #fff; text-color: #fff; display:flex; justify-content: center; align-items: center"
             >`;
         return { ...page, HTML: imageHTML };
       }
@@ -88,9 +94,6 @@ const Home = () => {
       const pagesWithMediaType = addMediaType(response);
       const pagesWithHtml = addHtml(pagesWithMediaType);
 
-      // console.log({ pagesWithMediaType });
-      // console.log({ pagesWithHtml });
-
       setPages(pagesWithHtml);
     } catch (error) {
       console.log(error);
@@ -103,8 +106,6 @@ const Home = () => {
       setCurrentPage(page);
       await util.sleep(page.Tempo);
     }
-
-    console.log("Resetou");
 
     buildSlideList();
   }
@@ -126,6 +127,14 @@ const Home = () => {
             : { uri: currentPage.URL }
         }
         scalesPageToFit={true}
+        style={{
+          flex: 1,
+          backgroundColor: currentPage.MediaType == "text" ? "#fff" : "#000",
+          margin: 0,
+          padding: 0,
+          width: "100%",
+          height: "100%",
+        }}
       />
     )
   );

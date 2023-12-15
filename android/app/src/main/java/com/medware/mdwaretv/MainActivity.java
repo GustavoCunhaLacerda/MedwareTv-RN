@@ -1,4 +1,4 @@
-package com.anonymous.MedwareTvRN;
+package com.medware.mdwaretv;
 
 import android.os.Build;
 import android.os.Bundle;

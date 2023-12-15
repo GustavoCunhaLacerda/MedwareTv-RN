@@ -1,15 +1,14 @@
 {
   "expo": {
-    "name": "MedwareTv-RN",
-    "slug": "MedwareTv-RN",
+    "name": "MedwareTv",
+    "slug": "MedwareTv",
     "version": "1.0.0",
     "orientation": "landscape",
     "userInterfaceStyle": "light",
-    "icon": "./assets/banner_medwareTV.png",
     "splash": {
-      "image": "./assets/splash.svg",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "image": "./assets/Splash.png",
+      "resizeMode": "native",
+      "backgroundColor": "#000"
     },
     "assetBundlePatterns": ["**/*"],
     "ios": {
@@ -18,8 +17,7 @@
 
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/banner_medwareTV.png",
-        "backgroundColor": "#ffffff"
+        "foreground": "./assets/banner_medware.png"
       },
       "intentFilters": [
         {
@@ -27,10 +25,7 @@
           "category": ["LEANBACK_LAUNCHER"]
         }
       ],
-      "package": "com.anonymous.MedwareTvRN"
-    },
-    "web": {
-      "favicon": "./assets/favicon.png"
+      "package": "com.medware.mdwaretv"
     },
     "extra": {
       "eas": {

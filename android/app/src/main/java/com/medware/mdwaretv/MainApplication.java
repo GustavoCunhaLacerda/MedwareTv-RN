@@ -1,4 +1,4 @@
-package com.anonymous.MedwareTvRN;
+package com.medware.mdwaretv;
 
 import android.app.Application;
 import android.content.res.Configuration;
