@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "MedwareTv",
-    "slug": "MedwareTv",
+    "slug": "medwaretv-rn",
     "version": "1.0.0",
     "orientation": "landscape",
     "userInterfaceStyle": "light",
@@ -10,11 +10,12 @@
       "resizeMode": "native",
       "backgroundColor": "#000"
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "supportsTablet": true
     },
-
     "android": {
       "adaptiveIcon": {
         "foreground": "./assets/banner_medware.png"
@@ -22,15 +23,18 @@
       "intentFilters": [
         {
           "action": "MAIN",
-          "category": ["LEANBACK_LAUNCHER"]
+          "category": [
+            "LEANBACK_LAUNCHER"
+          ]
         }
       ],
       "package": "com.medware.mdwaretv"
     },
     "extra": {
       "eas": {
-        "projectId": "14352a2e-9a47-4d45-8ac7-3e67bf4c08b0"
+        "projectId": "e11984fa-11a5-4ef3-bfcd-0ab93add65f1"
       }
-    }
+    },
+    "owner": "kaelbard"
   }
 }

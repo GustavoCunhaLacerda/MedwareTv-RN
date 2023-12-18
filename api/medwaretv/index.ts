@@ -6,10 +6,16 @@ export type MedwareTvPage = {
   Tipo: number;
 };
 
+export type Home = {
+  codTV: string;
+  showAlert: boolean;
+}
+
+
 export default {
   async list<TResponse>(codTv: string): Promise<TResponse> {
     return fetch(
-      "https://api.medware.com.br/MedwareTv/?" +
+      "https://api.medware.com.br/medwaretv/?" +
         new URLSearchParams({
           codTv,
         }),

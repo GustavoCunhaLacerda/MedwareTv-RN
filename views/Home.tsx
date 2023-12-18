@@ -3,11 +3,13 @@ import WebView from "react-native-webview";
 import api from "../api";
 import { MedwareTvPage } from "../api/medwaretv";
 import util from "../util";
+import App from "../App";
 
 const imageFiles = ["png", "gif", "jpg", "jpeg"];
 const videoFiles = ["mp4", "avi", "wmv"];
 
 type TVPage = MedwareTvPage & {
+  MedTv?: "MedTV";
   MediaType?: "video" | "text" | "image";
   HTML?: string | null;
 };
@@ -24,7 +26,7 @@ function useBaseHTML(content: string) {
     </html>`;
 }
 
-const Home = () => {
+const Home = ({ codTv, showAlert }) => {
   const [pages, setPages] = useState<TVPage[]>([]);
   const [currentPage, setCurrentPage] = useState<TVPage | null>(null);
 
@@ -57,22 +59,11 @@ const Home = () => {
 
   function addHtml(pages: TVPage[]) {
     return pages.map((page) => {
-      if (!page.MediaType) {
-        return {
-          ...page,
-          HTML: useBaseHTML(
-            "<p style='width: 100%; height: 100%; color: #fff; text-color: #fff; display:flex; justify-content: center; align-items: center'>Arquivo inválido!</p>",
-          ),
-        };
-      }
-
       if (page.MediaType == "image") {
         const imageHTML = `
             <img style="display: block;-webkit-user-select: none;margin: auto;cursor: zoom-in;background-color: #000;transition: background-color 300ms;height: 100%;max-width: 100%;object-fit: contain;" src="${page.URL}">`;
         return { ...page, HTML: imageHTML };
-      }
-
-      if (page.MediaType == "text") {
+      } else if (page.MediaType == "text") {
         const imageHTML = `
             <embed 
               type="text/txt" 
@@ -88,8 +79,13 @@ const Home = () => {
 
   async function buildSlideList() {
     try {
+      if (codTv == "0") {
+        showAlert();
+      }
       setPages([]);
-      const response = await api.medwaretv.list<MedwareTvPage[]>("1");
+      const response = await api.medwaretv.list<MedwareTvPage[]>(codTv);
+
+      console.log(response);
 
       const pagesWithMediaType = addMediaType(response);
       const pagesWithHtml = addHtml(pagesWithMediaType);
@@ -106,12 +102,15 @@ const Home = () => {
       setCurrentPage(page);
       await util.sleep(page.Tempo);
     }
-
     buildSlideList();
   }
 
   useEffect(() => {
-    if (pages.length > 0) showSlides();
+  buildSlideList();
+  }, [codTv]);
+
+  useEffect(() => {
+    if (pages.length > 0) !showSlides();
   }, [pages]);
 
   useEffect(() => {
